@@ -1,0 +1,4 @@
+/.idea/
+/nginx/var/log/nginx/
+/redis/
+/mysql/

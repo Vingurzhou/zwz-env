@@ -1,0 +1,144 @@
+version: '3'
+# 网络配置
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+#    ipam:
+#      config:
+#        - subnet: 172.20.0.0/16
+services:
+  mysql:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=Z00a0319
+    ports:
+      - "3306:3306"
+    volumes:
+#      - ./mysql/etc/mysql/my.cnf:/etc/mysql/my.cnf
+      - ./mysql/var/lib/mysql:/var/lib/mysql
+#      - ./mysql/sql:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+    command:
+      --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      #      - ./redis/usr/local/etc/redis.conf:/usr/local/etc/redis.conf
+      - ./redis/data:/data
+    #    environment:
+    #      - REDIS_PASSWORD=Z00a0319
+    #    command: redis-server /usr/local/etc/redis.conf --requirepass Z00a0319
+    networks:
+      - backend
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - ./nginx/etc/nginx/conf.d:/etc/nginx/conf.d
+      - ${CODE_PATH_HOST}:/var/www
+      - ./nginx/var/log/nginx:/var/log/nginx
+    networks:
+      - backend
+    restart: always
+    privileged: true
+
+  ubuntu:
+    build:
+      context: ./build/ubuntu
+    command: tail -f /dev/null
+
+  #  vingurzhou.github.io:
+  #    image: node:18
+  #    privileged: true
+  #    working_dir: ${CODE_PATH_HOST}/vingurzhou.github.io
+  #    volumes:
+  #      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+  #    ports:
+  #      - "3000:3000"
+  #    networks:
+  #      - backend
+  #    restart: always
+
+  admin-web.zwo.biz:
+    image: node:14.9.0
+    privileged: true
+    working_dir: ${CODE_PATH_HOST}/admin-web.zwo.biz
+    volumes:
+      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+    ports:
+      - "9527:9527"
+    networks:
+      - backend
+    restart: always
+    command: npm run dev
+
+  admin.zwo.biz:
+    image: golang:1.14
+    environment:
+      - GO111MODULE=on
+      - TZ=${TZ}
+    working_dir: ${CODE_PATH_HOST}/admin.zwo.biz
+    privileged: true
+    volumes:
+      #      - /Users/zhouwenzhe/go/pkg:/go/pkg
+      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+    command: go run main.go server -c config/settings.dev.yml -p 8000 -m dev
+    restart: always
+
+  #  astrometry.net:
+  #    build:
+  #      context: ./build/astrometry.net
+  #    ports:
+  #     - "9603:9603"
+  #    working_dir: ${CODE_PATH_HOST}/astrometry.net
+  #    volumes:
+  #      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+  ##      - ${NOVA_LOGS_PATH}:/data/nova
+  #    command: [ "sleep","infinity" ]
+  #    privileged: true
+  #    networks:
+  #      - backend
+  #    restart: always
+
+  bbs.zwo.biz:
+    build:
+      context: ./build/bbs.zwo.biz
+    working_dir: /var/www/bbs.zwo.biz
+    volumes:
+      - ${CODE_PATH_HOST}:/var/www
+    networks:
+      - backend
+
+  am5-motor-report-solve:
+    build:
+      context: ./build/am5-motor-report-solve
+    working_dir: ${CODE_PATH_HOST}/am5-motor-report-solve
+    volumes:
+      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+    privileged: true
+    networks:
+      - backend
+    restart: always
+    command: python3 server.py
+
+  zwobt:
+    build:
+      context: ./build/zwobt
+    working_dir: /var/www/zwobt
+    volumes:
+      - ${CODE_PATH_HOST}:/var/www
+    networks:
+      - backend
+
