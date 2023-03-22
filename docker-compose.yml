@@ -7,6 +7,16 @@ networks:
 #      config:
 #        - subnet: 172.20.0.0/16
 services:
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=secret_cookie
+    volumes:
+      - ./rabbitmq/var/lib/rabbitmq/mnesia:/var/lib/rabbitmq/mnesia
   mysql:
     image: mysql
     environment:
@@ -67,35 +77,35 @@ services:
   #      - backend
   #    restart: always
 
-  admin-web.zwo.biz:
-    image: node:14.9.0
-    privileged: true
-    working_dir: ${CODE_PATH_HOST}/admin-web.zwo.biz
-    volumes:
-      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
-    ports:
-      - "9527:9527"
-    networks:
-      - backend
-    restart: always
-    command: npm run dev
+#  admin-web.zwo.biz:
+#    image: node:14.9.0
+#    privileged: true
+#    working_dir: ${CODE_PATH_HOST}/admin-web.zwo.biz
+#    volumes:
+#      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+#    ports:
+#      - "9527:9527"
+#    networks:
+#      - backend
+#    restart: always
+#    command: npm run dev
 
-  admin.zwo.biz:
-    image: golang:1.14
-    environment:
-      - GO111MODULE=on
-      - TZ=${TZ}
-    working_dir: ${CODE_PATH_HOST}/admin.zwo.biz
-    privileged: true
-    volumes:
-      #      - /Users/zhouwenzhe/go/pkg:/go/pkg
-      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
-    ports:
-      - "8000:8000"
-    networks:
-      - backend
-    command: go run main.go server -c config/settings.dev.yml -p 8000 -m dev
-    restart: always
+#  admin.zwo.biz:
+#    image: golang:1.14
+#    environment:
+#      - GO111MODULE=on
+#      - TZ=${TZ}
+#    working_dir: ${CODE_PATH_HOST}/admin.zwo.biz
+#    privileged: true
+#    volumes:
+#      #      - /Users/zhouwenzhe/go/pkg:/go/pkg
+#      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+#    ports:
+#      - "8000:8000"
+#    networks:
+#      - backend
+#    command: go run main.go server -c config/settings.dev.yml -p 8000 -m dev
+#    restart: always
 
   #  astrometry.net:
   #    build:
@@ -112,33 +122,33 @@ services:
   #      - backend
   #    restart: always
 
-  bbs.zwo.biz:
-    build:
-      context: ./build/bbs.zwo.biz
-    working_dir: /var/www/bbs.zwo.biz
-    volumes:
-      - ${CODE_PATH_HOST}:/var/www
-    networks:
-      - backend
+#  bbs.zwo.biz:
+#    build:
+#      context: ./build/bbs.zwo.biz
+#    working_dir: /var/www/bbs.zwo.biz
+#    volumes:
+#      - ${CODE_PATH_HOST}:/var/www
+#    networks:
+#      - backend
 
-  am5-motor-report-solve:
-    build:
-      context: ./build/am5-motor-report-solve
-    working_dir: ${CODE_PATH_HOST}/am5-motor-report-solve
-    volumes:
-      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
-    privileged: true
-    networks:
-      - backend
-    restart: always
-    command: python3 server.py
+#  am5-motor-report-solve:
+#    build:
+#      context: ./build/am5-motor-report-solve
+#    working_dir: ${CODE_PATH_HOST}/am5-motor-report-solve
+#    volumes:
+#      - ${CODE_PATH_HOST}:${CODE_PATH_HOST}
+#    privileged: true
+#    networks:
+#      - backend
+#    restart: always
+#    command: python3 server.py
 
-  zwobt:
-    build:
-      context: ./build/zwobt
-    working_dir: /var/www/zwobt
-    volumes:
-      - ${CODE_PATH_HOST}:/var/www
-    networks:
-      - backend
+#  zwobt:
+#    build:
+#      context: ./build/zwobt
+#    working_dir: /var/www/zwobt
+#    volumes:
+#      - ${CODE_PATH_HOST}:/var/www
+#    networks:
+#      - backend
 

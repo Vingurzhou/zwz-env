@@ -89,5 +89,5 @@ docker-compose up -d
 ```
 - 按需启动部分服务
 ```bash
-docker-compose up -d golang mysql redis
+docker-compose up -d mysql redis ubuntu rabbitmq
 ```
