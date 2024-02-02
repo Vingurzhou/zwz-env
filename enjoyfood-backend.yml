@@ -1,0 +1,94 @@
+version: '3.0'
+
+services:
+  enjoyfood-backend-api-gateway:
+    image: golang:1.18
+    ports:
+      - "10000:10000"
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/v2.enjoyfood-backend:/go/src/app
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+    working_dir: /go/src/app
+    environment:
+      - ENJOYFOOD_LOG_LEVEL=debug
+      - ENJOYFOOD_ETCD_ENDPOINTS=${ENJOYFOOD_ETCD_ENDPOINTS}
+      - ENJOYFOOD_REDIS_ENDPOINT=${ENJOYFOOD_REDIS_ENDPOINT}
+      - ENJOYFOOD_REDIS_PASSWORD=Z00a0319
+      - GO111MODULE=on
+    command: go run cmd/api-gateway/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+
+  enjoyfood-backend-iam-manager:
+    image: golang:1.18
+    ports:
+      - "10001:10001"
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/v2.enjoyfood-backend:/go/src/app
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+    working_dir: /go/src/app
+    environment:
+      - ENJOYFOOD_LOG_LEVEL=debug
+      - ENJOYFOOD_ETCD_ENDPOINTS=${ENJOYFOOD_ETCD_ENDPOINTS}
+      - ENJOYFOOD_REDIS_ENDPOINT=${ENJOYFOOD_REDIS_ENDPOINT}
+      - ENJOYFOOD_REDIS_PASSWORD=Z00a0319
+      - ENJOYFOOD_PRISMA_ENDPOINT=http://119.3.106.151:10240/enjoyfood/iam
+    command: go run cmd/iam-manager/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+
+  enjoyfood-backend-assets-manager:
+    image: golang:1.18
+    ports:
+      - "10002:10002"
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/v2.enjoyfood-backend:/go/src/app
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+    working_dir: /go/src/app
+    environment:
+      - ENJOYFOOD_LOG_LEVEL=debug
+      - ENJOYFOOD_ETCD_ENDPOINTS=${ENJOYFOOD_ETCD_ENDPOINTS}
+      - ENJOYFOOD_REDIS_ENDPOINT=${ENJOYFOOD_REDIS_ENDPOINT}
+      - ENJOYFOOD_REDIS_PASSWORD=Z00a0319
+      - ENJOYFOOD_PRISMA_ENDPOINT=http://119.3.106.151:10240/enjoyfood/assets
+      - ENJOYFOOD_MYSQL_ENDPOINT=${ENJOYFOOD_MYSQL_ENDPOINT}
+      - ENJOYFOOD_MYSQL_USER=root
+      - ENJOYFOOD_MYSQL_PASSWORD=Yuhu8888
+      - ENJOYFOOD_MYSQL_DB_NAME=enjoyfood_assets
+      - ENJOYFOOD_MYSQL_ENABLE=true
+    command: go run cmd/assets-manager/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+
+  enjoyfood-backend-assets-cron:
+    image: golang:1.18
+    working_dir: /go/src/app
+    command: go run cmd/assets-cron/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+    environment:
+      - ENJOYFOOD_LOG_LEVEL=debug
+      - ENJOYFOOD_ETCD_ENDPOINTS=${ENJOYFOOD_ETCD_ENDPOINTS}
+      - ENJOYFOOD_REDIS_ENDPOINT=${ENJOYFOOD_REDIS_ENDPOINT}
+      - ENJOYFOOD_REDIS_PASSWORD=Z00a0319
+      - ENJOYFOOD_PRISMA_ENDPOINT=http://119.3.106.151:10240/enjoyfood/assets
+      - ENJOYFOOD_MYSQL_ENDPOINT=${ENJOYFOOD_MYSQL_ENDPOINT}
+      - ENJOYFOOD_MYSQL_USER=root
+      - ENJOYFOOD_MYSQL_PASSWORD=Yuhu8888
+      - ENJOYFOOD_MYSQL_DB_NAME=enjoyfood_assets
+      - ENJOYFOOD_MYSQL_ENABLE=true
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/v2.enjoyfood-backend:/go/src/app
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build

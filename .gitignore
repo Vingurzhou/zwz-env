@@ -1,5 +1,11 @@
-/.idea/
-/nginx/var/log/nginx/
-/redis/
-/mysql/
-/rabbitmq/
+/elasticsearch/*
+/redis/*
+/root/*
+.idea/.gitignore
+.idea/dataSources.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/webServers.xml
+.idea/zwzEnv.iml
+.DS_Store
+.idea/zwz-env.iml

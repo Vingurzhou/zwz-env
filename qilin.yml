@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+  qilin-basic-assets-cron:
+    image: golang:1.18
+    working_dir: /Users/zhouwenzhe/src/yuhuProject/Qilin
+    command: go run cmd/assets-cron/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+    environment:
+      - QILIN_LOG_LEVEL=${QILIN_LOG_LEVEL}
+      - QILIN_ETCD_ENDPOINTS=${QILIN_ETCD_ENDPOINTS}
+      - QILIN_REDIS_ENDPOINT=${QILIN_REDIS_ENDPOINT}
+      - QILIN_REDIS_PASSWORD=${QILIN_REDIS_PASSWORD}
+      - QILIN_MYSQL_ENDPOINT=${QILIN_MYSQL_ENDPOINT}
+      - QILIN_MYSQL_USER=${QILIN_MYSQL_USER}
+      - QILIN_MYSQL_PASSWORD=${QILIN_MYSQL_PASSWORD}
+      - QILIN_MYSQL_DB_NAME=basic_assets
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/Qilin:/Users/zhouwenzhe/src/yuhuProject/Qilin
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+
+  qilin-basic-contract-manager:
+    image: golang:1.18
+    working_dir: /Users/zhouwenzhe/src/yuhuProject/Qilin
+    command: go run cmd/contract-service/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+    environment:
+      - QILIN_LOG_LEVEL=${QILIN_LOG_LEVEL}
+      - QILIN_ETCD_ENDPOINTS=${QILIN_ETCD_ENDPOINTS}
+      - QILIN_REDIS_ENDPOINT=${QILIN_REDIS_ENDPOINT}
+      - QILIN_REDIS_PASSWORD=${QILIN_REDIS_PASSWORD}
+      - QILIN_MYSQL_ENDPOINT=${QILIN_MYSQL_ENDPOINT}
+      - QILIN_MYSQL_USER=${QILIN_MYSQL_USER}
+      - QILIN_MYSQL_PASSWORD=${QILIN_MYSQL_PASSWORD}
+      - QILIN_MYSQL_DB_NAME=basic_contract
+    ports:
+      - "10013:10013"
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/Qilin:/Users/zhouwenzhe/src/yuhuProject/Qilin
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+
+  qilin-aggr-manager:
+    build:
+      context: .
+      dockerfile: golang_1_18.Dockerfile
+    working_dir: /Users/zhouwenzhe/src/yuhuProject/Qilin
+    command: go run cmd/aggr-interface/main.go
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://localhost:9200"
+    environment:
+      - QILIN_LOG_LEVEL=${QILIN_LOG_LEVEL}
+      - QILIN_ETCD_ENDPOINTS=${QILIN_ETCD_ENDPOINTS}
+      - QILIN_REDIS_ENDPOINT=${QILIN_REDIS_ENDPOINT}
+      - QILIN_REDIS_PASSWORD=${QILIN_REDIS_PASSWORD}
+      - QILIN_MYSQL_ENDPOINT=${QILIN_MYSQL_ENDPOINT}
+      - QILIN_MYSQL_USER=${QILIN_MYSQL_USER}
+      - QILIN_MYSQL_PASSWORD=${QILIN_MYSQL_PASSWORD}
+      - QILIN_MYSQL_DB_NAME=aggr
+      - CGO_CFLAGS_ALLOW=".*"
+    volumes:
+      - /Users/zhouwenzhe/src/yuhuProject/Qilin:/Users/zhouwenzhe/src/yuhuProject/Qilin
+      - /Users/zhouwenzhe/go/pkg/mod:/go/pkg/mod
+      - /Users/zhouwenzhe/Library/Caches/go-build:/root/.cache/go-build
+    ports:
+      - "10001:10001"
+      - "10000:10000"
