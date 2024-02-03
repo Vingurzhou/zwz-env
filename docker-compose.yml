@@ -33,7 +33,7 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf --requirepass Z00a0319
     volumes:
       - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
-#      - ./redis/data:/data
+    #      - ./redis/data:/data
     ports:
       - "6379:6379"
 
@@ -49,3 +49,7 @@ services:
       dockerfile: ubuntu_20_04.Dockerfile
     volumes:
       - /Users/zhouwenzhe:/home/zhouwenzhe
+    logging:
+      driver: "elastic/elastic-logging-plugin:8.11.4"
+      options:
+        hosts: "http://127.0.0.1:9200"

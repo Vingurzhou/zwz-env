@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 #设置环境变量###################
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
-ENV PATH=$PATH:/usr/local/go/bin
+ENV PATH=$PATH:/usr/local/go/bin:/root/go/bin
 ENV GO111MODULE="on"
 ENV ZSH=/root/.oh-my-zsh
 ENV GOPRIVATE="github.com/astra-x/*,github.com/yuhu-tech/*,go.etcd.io/*,chainmaker.org"
@@ -21,12 +21,26 @@ RUN apt-get install -y zsh
 RUN apt-get install -y wget
 RUN apt-get install -y tzdata
 
+#配置git#####################
+RUN git config --global --unset http.extraheader 
+RUN git config --global --unset https.extraheader 
+RUN git config --global credential.helper cache
+RUN git config --global credential.helper 'cache --timeout=3600'
+RUN git config --global user.email "zwz0123460218@icloud.com"
+RUN git config --global user.name "vingur"
+RUN git config --global credential.helper ''
+##仓库配置
+RUN git config credential.helper ''
+RUN git config --unset user.email
+RUN git config --unset user.name  
+
 #安装npm插件#####################
 # RUN npm install pm2 -g
 
 #安装go插件########################
 RUN wget https://go.dev/dl/go1.18.linux-arm64.tar.gz
 RUN tar -C /usr/local -xzf go1.18.linux-arm64.tar.gz
+RUN rm -rf go1.18.linux-arm64.tar.gz
 RUN go install -v golang.org/x/tools/gopls@latest
 RUN go install github.com/go-delve/delve/cmd/dlv@v1.9.0
 RUN go install honnef.co/go/tools/cmd/staticcheck@v0.3.3
